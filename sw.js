@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "turbo-tackle-";
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
+const CACHE_NAME = `${CACHE_PREFIX}v2`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const ASSETS = [
   "./js/app.js",
   "./js/game.js",
   "./js/storage.js",
+  "./js/sprites.js",
   "./icons/icon.svg",
   "./icons/icon-180.png",
   "./icons/icon-192.png",

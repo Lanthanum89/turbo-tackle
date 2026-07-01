@@ -9,6 +9,8 @@ html, body {
   height: 100%;
   background: #0f0f23;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   font-family: "Courier New", monospace;
   color: #fff;
 }
@@ -17,9 +19,12 @@ html, body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
 #game-canvas {
@@ -27,6 +32,7 @@ html, body {
   background: #1a1a3e;
   max-width: 100%;
   max-height: 100%;
+  touch-action: none;
 }
 
 .overlay {
@@ -111,12 +117,13 @@ html, body {
 
 #touch-controls {
   position: absolute;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 clamp(16px, 6vw, 48px);
+  touch-action: none;
 }
 
 #touch-controls.hidden {
@@ -124,16 +131,17 @@ html, body {
 }
 
 #touch-controls button {
-  width: 70px;
-  height: 70px;
-  font-size: 28px;
+  width: clamp(64px, 16vw, 88px);
+  height: clamp(64px, 16vw, 88px);
+  font-size: clamp(24px, 5vw, 32px);
   background: rgba(255, 255, 255, 0.15);
   border: 3px solid #fff;
   color: #fff;
   border-radius: 50%;
+  touch-action: none;
 }
 
-@media (min-width: 700px) {
+@media (hover: hover) and (pointer: fine) {
   #touch-controls {
     display: none !important;
   }

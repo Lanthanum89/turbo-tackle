@@ -15,11 +15,28 @@ const restartBtn = document.getElementById("restart-btn");
 
 let game = null;
 
+function bindPress(el, handler) {
+  el.addEventListener(
+    "touchstart",
+    (e) => {
+      e.preventDefault();
+      handler();
+    },
+    { passive: false }
+  );
+  el.addEventListener("click", handler);
+}
+
 function renderLives(count) {
   livesHud.textContent = "❤".repeat(Math.max(count, 0));
 }
 
 function showStartScreen() {
+  if (game) {
+    game.stop();
+    game.destroy();
+    game = null;
+  }
   startScreen.classList.remove("hidden");
   gameOverScreen.classList.add("hidden");
   hud.classList.add("hidden");
@@ -56,10 +73,10 @@ function startGame(difficulty) {
 }
 
 document.querySelectorAll(".diff-btn[data-difficulty]").forEach((btn) => {
-  btn.addEventListener("click", () => startGame(btn.dataset.difficulty));
+  bindPress(btn, () => startGame(btn.dataset.difficulty));
 });
 
-restartBtn.addEventListener("click", showStartScreen);
+bindPress(restartBtn, showStartScreen);
 
 document.addEventListener("keydown", (e) => {
   if (!game) return;
@@ -67,13 +84,24 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowRight" || e.key === "d") game.moveRight();
 });
 
-document.getElementById("btn-left").addEventListener("click", () => game && game.moveLeft());
-document.getElementById("btn-right").addEventListener("click", () => game && game.moveRight());
+bindPress(document.getElementById("btn-left"), () => game && game.moveLeft());
+bindPress(document.getElementById("btn-right"), () => game && game.moveRight());
 
 let touchStartX = null;
-canvas.addEventListener("touchstart", (e) => {
-  touchStartX = e.changedTouches[0].clientX;
-});
+canvas.addEventListener(
+  "touchstart",
+  (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  },
+  { passive: true }
+);
+canvas.addEventListener(
+  "touchmove",
+  (e) => {
+    e.preventDefault();
+  },
+  { passive: false }
+);
 canvas.addEventListener("touchend", (e) => {
   if (touchStartX === null || !game) return;
   const dx = e.changedTouches[0].clientX - touchStartX;
