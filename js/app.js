@@ -12,8 +12,23 @@ const finalScoreEl = document.getElementById("final-score");
 const highScoreLineEl = document.getElementById("high-score-line");
 const highScoreDisplay = document.getElementById("high-score-display");
 const restartBtn = document.getElementById("restart-btn");
+const countdownOverlay = document.getElementById("countdown-overlay");
+const countdownText = document.getElementById("countdown-text");
 
 let game = null;
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runCountdown() {
+  countdownOverlay.classList.remove("hidden");
+  for (const label of ["3", "2", "1", "GO!"]) {
+    countdownText.textContent = label;
+    await wait(600);
+  }
+  countdownOverlay.classList.add("hidden");
+}
 
 function bindPress(el, handler) {
   el.addEventListener(
@@ -44,11 +59,15 @@ function showStartScreen() {
   highScoreDisplay.textContent = `High Score: ${getHighScore()}`;
 }
 
-function startGame(difficulty) {
+function triggerHitShake() {
+  canvas.classList.remove("hit-shake");
+  void canvas.offsetWidth; // force reflow so the animation restarts on repeat hits
+  canvas.classList.add("hit-shake");
+}
+
+async function startGame(difficulty) {
   startScreen.classList.add("hidden");
   gameOverScreen.classList.add("hidden");
-  hud.classList.remove("hidden");
-  touchControls.classList.remove("hidden");
 
   game = new Game(canvas, difficulty, {
     onScoreUpdate: (score) => {
@@ -56,6 +75,7 @@ function startGame(difficulty) {
     },
     onHit: (livesLeft) => {
       renderLives(livesLeft);
+      triggerHitShake();
     },
     onGameOver: (finalScore) => {
       const best = setHighScoreIfBetter(finalScore);
@@ -69,6 +89,12 @@ function startGame(difficulty) {
 
   renderLives(game.lives);
   scoreHud.textContent = "0";
+  game.draw();
+
+  await runCountdown();
+  if (!game) return;
+  hud.classList.remove("hidden");
+  touchControls.classList.remove("hidden");
   game.start();
 }
 

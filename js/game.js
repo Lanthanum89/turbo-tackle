@@ -93,9 +93,14 @@ export class Game {
     this.carHeight = this.carPixelSize * CAR_ROWS;
 
     this.ballPixelSize = (this.laneWidth * 0.4) / BALL_COLS;
+    this.carBottomMargin = Math.max(48, this.displayHeight * 0.09);
     for (const ball of this.balls) {
       ball.radius = this.laneWidth * 0.18;
     }
+  }
+
+  carTopY() {
+    return this.displayHeight - this.carHeight - this.carBottomMargin;
   }
 
   destroy() {
@@ -152,7 +157,7 @@ export class Game {
       this.spawnBall();
     }
 
-    const carTop = this.displayHeight - this.carHeight - 20;
+    const carTop = this.carTopY();
     for (const ball of this.balls) {
       ball.y += this.ballSpeed * dt;
     }
@@ -234,7 +239,7 @@ export class Game {
     }
 
     const carX = this.laneCenterX(this.carLane);
-    const carTop = this.displayHeight - this.carHeight - 20;
+    const carTop = this.carTopY();
     const blinkOff =
       this.invulnerableTimer > 0 && Math.floor(this.invulnerableTimer * 12) % 2 === 0;
 
