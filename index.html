@@ -4,10 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>Turbo Tackle</title>
-<meta name="theme-color" content="#0f0f23" />
+<meta name="theme-color" content="#050813" />
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="icons/icon-180.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,31 +17,48 @@
   <canvas id="game-canvas"></canvas>
 
   <div id="start-screen" class="overlay">
-    <h1>🏎️ TURBO TACKLE</h1>
+    <button id="mute-btn" class="icon-btn corner-btn" aria-label="Toggle sound">🔊</button>
+    <div class="title-emoji">🏎️</div>
+    <h1>TURBO<br />TACKLE</h1>
     <p class="subtitle">Dodge the footballs!</p>
+
     <div class="difficulty-select">
-      <div class="diff-option">
-        <button class="diff-btn" data-difficulty="easy">Easy</button>
-        <span class="diff-sub">slow balls</span>
-      </div>
-      <div class="diff-option">
-        <button class="diff-btn" data-difficulty="normal">Normal</button>
-        <span class="diff-sub">faster</span>
-      </div>
-      <div class="diff-option">
-        <button class="diff-btn" data-difficulty="hard">Hard</button>
-        <span class="diff-sub">chaos mode</span>
-      </div>
+      <button class="diff-card diff-easy" data-difficulty="easy">
+        <span class="diff-card-row"><span class="diff-name">EASY</span><span class="diff-hearts">❤❤❤❤❤</span></span>
+        <span class="diff-desc">Slow &amp; steady — great for first runs</span>
+      </button>
+      <button class="diff-card diff-normal" data-difficulty="normal">
+        <span class="diff-card-row"><span class="diff-name">NORMAL</span><span class="diff-hearts">❤❤❤❤</span></span>
+        <span class="diff-desc">Picks up speed as you go</span>
+      </button>
+      <button class="diff-card diff-hard" data-difficulty="hard">
+        <span class="diff-card-row"><span class="diff-name">HARD</span><span class="diff-hearts">❤❤❤</span></span>
+        <span class="diff-desc">Fast, less warning before balls arrive</span>
+      </button>
     </div>
+
     <p id="high-score-display" class="high-score"></p>
     <p class="control-hint">← → or swipe to dodge</p>
   </div>
 
   <div id="game-over-screen" class="overlay hidden">
-    <h1>GAME OVER</h1>
-    <p id="final-score" class="score-line"></p>
-    <p id="high-score-line" class="score-line"></p>
-    <button id="restart-btn" class="diff-btn">Play Again</button>
+    <h1 class="game-over-title">GAME OVER</h1>
+    <p id="game-over-message" class="message-line"></p>
+    <p id="final-score" class="final-score"></p>
+    <div class="stats-row">
+      <span id="stat-best">Best: 0</span>
+      <span id="stat-time">Time: 0.0s</span>
+      <span id="stat-dodged">Dodged: 0</span>
+    </div>
+    <button id="restart-btn" class="primary-btn">Play Again</button>
+    <button id="change-difficulty-btn" class="outline-btn">Change difficulty</button>
+  </div>
+
+  <div id="pause-overlay" class="overlay hidden">
+    <h1 class="pause-title">PAUSED</h1>
+    <button id="resume-btn" class="primary-btn">▶ Resume</button>
+    <button id="pause-mute-btn" class="secondary-btn">🔊 Sound</button>
+    <button id="quit-btn" class="outline-btn">Quit to menu</button>
   </div>
 
   <div id="countdown-overlay" class="overlay hidden">
@@ -47,6 +66,7 @@
   </div>
 
   <div id="hud" class="hidden">
+    <button id="pause-btn" class="icon-btn" aria-label="Pause">⏸</button>
     <span id="score-hud">0</span>
     <span id="lives-hud"></span>
   </div>
