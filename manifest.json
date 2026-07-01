@@ -1,7 +1,7 @@
 {
   "name": "Turbo Tackle",
   "short_name": "Turbo Tackle",
-  "description": "Retro 8-bit racer for kids - dodge the footballs!",
+  "description": "Retro 8-bit racer for kids — dodge the rocks, grab the stars!",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

@@ -61,8 +61,10 @@ html, body {
   margin: 0;
 }
 
-.title-emoji {
-  font-size: 26px;
+.title-badge {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
 }
 
 .subtitle {
