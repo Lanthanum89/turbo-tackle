@@ -72,6 +72,19 @@ html, body {
   justify-content: center;
 }
 
+.diff-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.diff-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.5px;
+}
+
 .diff-btn {
   font-family: inherit;
   font-size: 16px;
@@ -82,7 +95,7 @@ html, body {
   border-radius: 10px;
   cursor: pointer;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
 }
 
 .diff-btn:active {
@@ -90,9 +103,45 @@ html, body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .diff-btn:hover {
+    background: #ff6a6e;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.control-hint {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  margin: 0;
+}
+
 .high-score, .score-line {
   color: #ffd60a;
   margin: 0;
+}
+
+#countdown-overlay {
+  background: rgba(15, 15, 35, 0.45);
+}
+
+#countdown-text {
+  font-size: clamp(64px, 20vw, 120px);
+  color: #ffd60a;
+  text-shadow: 2px 2px 8px rgba(255, 77, 77, 0.7);
+  font-weight: bold;
+}
+
+@keyframes hit-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-6px, 3px); }
+  50% { transform: translate(6px, -3px); }
+  75% { transform: translate(-4px, -2px); }
+}
+
+#game-canvas.hit-shake {
+  animation: hit-shake 0.3s ease;
 }
 
 #hud {

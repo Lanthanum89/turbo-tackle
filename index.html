@@ -18,11 +18,21 @@
     <h1>🏎️ TURBO TACKLE</h1>
     <p class="subtitle">Dodge the footballs!</p>
     <div class="difficulty-select">
-      <button class="diff-btn" data-difficulty="easy">Easy</button>
-      <button class="diff-btn" data-difficulty="normal">Normal</button>
-      <button class="diff-btn" data-difficulty="hard">Hard</button>
+      <div class="diff-option">
+        <button class="diff-btn" data-difficulty="easy">Easy</button>
+        <span class="diff-sub">slow balls</span>
+      </div>
+      <div class="diff-option">
+        <button class="diff-btn" data-difficulty="normal">Normal</button>
+        <span class="diff-sub">faster</span>
+      </div>
+      <div class="diff-option">
+        <button class="diff-btn" data-difficulty="hard">Hard</button>
+        <span class="diff-sub">chaos mode</span>
+      </div>
     </div>
     <p id="high-score-display" class="high-score"></p>
+    <p class="control-hint">← → or swipe to dodge</p>
   </div>
 
   <div id="game-over-screen" class="overlay hidden">
@@ -30,6 +40,10 @@
     <p id="final-score" class="score-line"></p>
     <p id="high-score-line" class="score-line"></p>
     <button id="restart-btn" class="diff-btn">Play Again</button>
+  </div>
+
+  <div id="countdown-overlay" class="overlay hidden">
+    <div id="countdown-text">3</div>
   </div>
 
   <div id="hud" class="hidden">
