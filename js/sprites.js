@@ -25,22 +25,19 @@ export const CAR_COLORS = {
 };
 
 export const FOOTBALL_SPRITE = [
-  "..EBBE..",
-  ".EBBBBE.",
-  "EBBBBBBE",
-  "BBBWWBBB",
-  "BBWWWWBB",
-  "BBBWWBBB",
-  "BBWWWWBB",
-  "EBBBBBBE",
-  ".EBBBBE.",
-  "..EBBE..",
+  "..WBBW..",
+  ".WBWWBW.",
+  "WBWBBWBW",
+  "BWBBBBWB",
+  "BWBBBBWB",
+  "WBWBBWBW",
+  ".WBWWBW.",
+  "..WBBW..",
 ];
 
 export const FOOTBALL_COLORS = {
-  B: "#8a5a2c",
-  E: "#a97a45",
   W: "#f4f1e8",
+  B: "#1a1a1a",
 };
 
 export function drawSprite(ctx, rows, colors, x, y, pixelSize, overrideColor) {
