@@ -118,12 +118,17 @@ export class Game {
 
   pause() {
     this.paused = true;
+    if (this._raf) {
+      cancelAnimationFrame(this._raf);
+      this._raf = null;
+    }
   }
 
   resume() {
-    if (!this.running) return;
+    if (!this.running || !this.paused) return;
     this.paused = false;
     this.lastTimestamp = null;
+    this._raf = requestAnimationFrame((ts) => this.loop(ts));
   }
 
   stop() {
@@ -144,15 +149,13 @@ export class Game {
   }
 
   loop(timestamp) {
-    if (!this.running) return;
-    if (!this.paused) {
-      if (this.lastTimestamp === null) this.lastTimestamp = timestamp;
-      const dt = Math.min((timestamp - this.lastTimestamp) / 1000, 0.05);
-      this.lastTimestamp = timestamp;
-      this.update(dt);
-    }
+    if (!this.running || this.paused) return;
+    if (this.lastTimestamp === null) this.lastTimestamp = timestamp;
+    const dt = Math.min((timestamp - this.lastTimestamp) / 1000, 0.05);
+    this.lastTimestamp = timestamp;
+    this.update(dt);
     this.draw();
-    if (this.running) this._raf = requestAnimationFrame((ts) => this.loop(ts));
+    this._raf = requestAnimationFrame((ts) => this.loop(ts));
   }
 
   update(dt) {
@@ -203,9 +206,10 @@ export class Game {
     }
 
     this.balls = this.balls.filter((b) => {
-      const keep = b.hit || b.y - b.radius < this.displayHeight;
-      if (!keep && !b.hit) this.dodged += 1;
-      return keep;
+      if (b.hit) return false;
+      const onScreen = b.y - b.radius < this.displayHeight;
+      if (!onScreen) this.dodged += 1;
+      return onScreen;
     });
     this.updateParticles(dt);
 

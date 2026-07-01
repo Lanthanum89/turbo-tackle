@@ -52,6 +52,9 @@ function ensureAudio() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (Ctx) audioCtx = new Ctx();
   }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+  }
   return audioCtx;
 }
 
@@ -184,6 +187,9 @@ bindPress(pauseMuteBtn, toggleMute);
 document.addEventListener("keydown", (e) => {
   if (!game) return;
   const key = e.key.toLowerCase();
+  if (key === "arrowleft" || key === "arrowright" || key === " ") {
+    e.preventDefault();
+  }
   if (game.paused) {
     if (key === " " || key === "escape") setPaused(false);
     return;
