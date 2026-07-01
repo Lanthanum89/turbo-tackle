@@ -123,8 +123,13 @@ async function runCountdown() {
 async function startGame(difficulty) {
   lastDifficulty = difficulty;
   ensureAudio();
+  if (game) {
+    game.destroy();
+    game = null;
+  }
   startScreen.classList.add("hidden");
   gameOverScreen.classList.add("hidden");
+  pauseOverlay.classList.add("hidden");
 
   game = new Game(canvas, difficulty, THEME, {
     onScoreUpdate: (score) => {
@@ -147,6 +152,10 @@ async function startGame(difficulty) {
       hud.classList.add("hidden");
       touchControls.classList.add("hidden");
       playTone(finalScore > prevBest ? 660 : 220, 0.35, "square");
+      if (game) {
+        game.destroy();
+        game = null;
+      }
     },
   });
 
