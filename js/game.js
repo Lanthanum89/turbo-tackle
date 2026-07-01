@@ -13,13 +13,9 @@ export class Game {
     this.settings = DIFFICULTY_SETTINGS[difficulty] || DIFFICULTY_SETTINGS.normal;
     this.callbacks = callbacks;
 
+    this.carLane = 1;
     this.resize();
     window.addEventListener("resize", () => this.resize());
-
-    this.laneWidth = this.canvas.width / LANE_COUNT;
-    this.carLane = 1;
-    this.carWidth = this.laneWidth * 0.5;
-    this.carHeight = this.carWidth * 1.4;
 
     this.lives = this.settings.lives;
     this.score = 0;
@@ -41,8 +37,11 @@ export class Game {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.displayWidth = width;
     this.displayHeight = height;
-    if (this.laneWidth) {
-      this.laneWidth = this.displayWidth / LANE_COUNT;
+    this.laneWidth = this.displayWidth / LANE_COUNT;
+    this.carWidth = this.laneWidth * 0.5;
+    this.carHeight = this.carWidth * 1.4;
+    for (const ball of this.balls || []) {
+      ball.radius = this.laneWidth * 0.18;
     }
   }
 

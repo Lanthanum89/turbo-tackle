@@ -1,4 +1,5 @@
-const CACHE_NAME = "turbo-tackle-v1";
+const CACHE_PREFIX = "turbo-tackle-";
+const CACHE_NAME = `${CACHE_PREFIX}v1`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +9,9 @@ const ASSETS = [
   "./js/game.js",
   "./js/storage.js",
   "./icons/icon.svg",
+  "./icons/icon-180.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -20,7 +24,11 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
+      Promise.all(
+        keys
+          .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
