@@ -1,0 +1,26 @@
+export const THEME = {
+  grassA: "#0f2a1a",
+  grassB: "#123420",
+  track: "#0d1230",
+  edge: "#ff2d2d",
+  laneLine: "#3d8bff",
+  sparkColor: "#ffe135",
+  carColors: {
+    C: "#101a3a",
+    c: "#ff2d2d",
+    D: "#0a1230",
+    W: "#3d8bff",
+    w: "#1a4fa0",
+    H: "#ffe135",
+    K: "#0a0a12",
+    k: "#3a3f52",
+    M: "#181420",
+    G: "#141018",
+    T: "#39ff6a",
+  },
+  ballColors: {
+    W: "#f4f1e8",
+    o: "#ff2d2d",
+    B: "#120018",
+  },
+};

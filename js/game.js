@@ -1,10 +1,4 @@
-import {
-  CAR_SPRITE,
-  CAR_COLORS,
-  FOOTBALL_SPRITE,
-  FOOTBALL_COLORS,
-  drawSprite,
-} from "./sprites.js";
+import { CAR_SPRITE, FOOTBALL_SPRITE, drawSprite } from "./sprites.js";
 
 const LANE_COUNT = 3;
 const TRACK_MARGIN_RATIO = 0.1;
@@ -14,21 +8,22 @@ const BALL_COLS = FOOTBALL_SPRITE[0].length;
 const BALL_ROWS = FOOTBALL_SPRITE.length;
 const TARGET_ASPECT = 9 / 16;
 const MAX_WIDTH = 520;
-const INVULNERABLE_SECONDS = 1;
+const INVULNERABLE_SECONDS = 1.1;
 
-const DIFFICULTY_SETTINGS = {
-  easy: { lives: 5, spawnIntervalMs: 1400, ballSpeed: 140, speedRampPerSec: 3 },
-  normal: { lives: 3, spawnIntervalMs: 1000, ballSpeed: 190, speedRampPerSec: 6 },
-  hard: { lives: 2, spawnIntervalMs: 750, ballSpeed: 240, speedRampPerSec: 10 },
+export const DIFFICULTY_SETTINGS = {
+  easy: { lives: 5, spawnIntervalMs: 1400, ballSpeed: 130, speedRampPerSec: 2.5 },
+  normal: { lives: 4, spawnIntervalMs: 1000, ballSpeed: 175, speedRampPerSec: 5 },
+  hard: { lives: 3, spawnIntervalMs: 720, ballSpeed: 225, speedRampPerSec: 9 },
 };
 
 export class Game {
-  constructor(canvas, difficulty, callbacks) {
+  constructor(canvas, difficulty, theme, callbacks) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.ctx.imageSmoothingEnabled = false;
     this.settings = DIFFICULTY_SETTINGS[difficulty] || DIFFICULTY_SETTINGS.normal;
-    this.callbacks = callbacks;
+    this.theme = theme;
+    this.callbacks = callbacks || {};
 
     this.carLane = 1;
     this.balls = [];
@@ -40,12 +35,16 @@ export class Game {
 
     this.lives = this.settings.lives;
     this.score = 0;
+    this.dodged = 0;
+    this.elapsed = 0;
     this.ballSpeed = this.settings.ballSpeed;
     this.timeSinceSpawn = 0;
     this.roadOffset = 0;
     this.invulnerableTimer = 0;
     this.running = false;
+    this.paused = false;
     this.lastTimestamp = null;
+    this._raf = null;
   }
 
   resize() {
@@ -104,18 +103,37 @@ export class Game {
   }
 
   destroy() {
+    this.running = false;
+    if (this._raf) cancelAnimationFrame(this._raf);
     window.removeEventListener("resize", this.onResize);
     window.removeEventListener("orientationchange", this.onResize);
   }
 
   start() {
     this.running = true;
+    this.paused = false;
     this.lastTimestamp = null;
-    requestAnimationFrame((ts) => this.loop(ts));
+    this._raf = requestAnimationFrame((ts) => this.loop(ts));
+  }
+
+  pause() {
+    this.paused = true;
+    if (this._raf) {
+      cancelAnimationFrame(this._raf);
+      this._raf = null;
+    }
+  }
+
+  resume() {
+    if (!this.running || !this.paused) return;
+    this.paused = false;
+    this.lastTimestamp = null;
+    this._raf = requestAnimationFrame((ts) => this.loop(ts));
   }
 
   stop() {
     this.running = false;
+    if (this._raf) cancelAnimationFrame(this._raf);
   }
 
   moveLeft() {
@@ -131,19 +149,18 @@ export class Game {
   }
 
   loop(timestamp) {
-    if (!this.running) return;
+    if (!this.running || this.paused) return;
     if (this.lastTimestamp === null) this.lastTimestamp = timestamp;
     const dt = Math.min((timestamp - this.lastTimestamp) / 1000, 0.05);
     this.lastTimestamp = timestamp;
-
     this.update(dt);
     this.draw();
-
-    if (this.running) requestAnimationFrame((ts) => this.loop(ts));
+    this._raf = requestAnimationFrame((ts) => this.loop(ts));
   }
 
   update(dt) {
     this.score += dt * 10;
+    this.elapsed += dt;
     this.ballSpeed += this.settings.speedRampPerSec * dt;
     this.roadOffset += this.ballSpeed * dt;
 
@@ -173,10 +190,14 @@ export class Game {
           this.lives -= 1;
           this.invulnerableTimer = INVULNERABLE_SECONDS;
           this.spawnHitParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
-          this.callbacks.onHit(this.lives);
+          this.callbacks.onHit && this.callbacks.onHit(this.lives);
           if (this.lives <= 0) {
             this.stop();
-            this.callbacks.onGameOver(Math.floor(this.score));
+            this.callbacks.onGameOver &&
+              this.callbacks.onGameOver(Math.floor(this.score), {
+                dodged: this.dodged,
+                elapsed: this.elapsed,
+              });
             return;
           }
           break;
@@ -184,10 +205,15 @@ export class Game {
       }
     }
 
-    this.balls = this.balls.filter((b) => !b.hit && b.y - b.radius < this.displayHeight);
+    this.balls = this.balls.filter((b) => {
+      if (b.hit) return false;
+      const onScreen = b.y - b.radius < this.displayHeight;
+      if (!onScreen) this.dodged += 1;
+      return onScreen;
+    });
     this.updateParticles(dt);
 
-    this.callbacks.onScoreUpdate(Math.floor(this.score));
+    this.callbacks.onScoreUpdate && this.callbacks.onScoreUpdate(Math.floor(this.score));
   }
 
   spawnBall() {
@@ -201,9 +227,9 @@ export class Game {
   }
 
   spawnHitParticles(cx, cy) {
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 16; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 60 + Math.random() * 120;
+      const speed = 60 + Math.random() * 130;
       this.particles.push({
         x: cx,
         y: cy,
@@ -211,7 +237,7 @@ export class Game {
         vy: Math.sin(angle) * speed - 40,
         life: 0.5,
         maxLife: 0.5,
-        color: Math.random() > 0.5 ? "#8a5a2c" : "#ffd60a",
+        color: Math.random() > 0.5 ? "#8a5a2c" : this.theme.sparkColor,
       });
     }
   }
@@ -229,7 +255,6 @@ export class Game {
   draw() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
-
     this.drawGrass();
     this.drawTrack();
 
@@ -247,6 +272,12 @@ export class Game {
     if (!blinkOff) this.drawCar(carX, carTop);
 
     this.drawParticles();
+
+    if (this.invulnerableTimer > 0) {
+      const t = this.invulnerableTimer / INVULNERABLE_SECONDS;
+      ctx.fillStyle = `rgba(255, 60, 60, ${0.16 * t})`;
+      ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+    }
   }
 
   drawGrass() {
@@ -262,7 +293,7 @@ export class Game {
         for (let x = left; x < right; x += blockSize) {
           const row = Math.floor((y + offset) / blockSize);
           const col = Math.floor(x / blockSize);
-          ctx.fillStyle = (row + col) % 2 === 0 ? "#1f7a3d" : "#256b34";
+          ctx.fillStyle = (row + col) % 2 === 0 ? this.theme.grassA : this.theme.grassB;
           ctx.fillRect(x, Math.floor(y + offset), blockSize, blockSize);
         }
       }
@@ -271,14 +302,14 @@ export class Game {
 
   drawTrack() {
     const ctx = this.ctx;
-    ctx.fillStyle = "#3a3a52";
+    ctx.fillStyle = this.theme.track;
     ctx.fillRect(this.trackMargin, 0, this.trackWidth, this.displayHeight);
 
-    ctx.strokeStyle = "#f4f1e8";
+    ctx.strokeStyle = this.theme.edge;
     ctx.lineWidth = 3;
     ctx.strokeRect(this.trackMargin, 0, this.trackWidth, this.displayHeight);
 
-    ctx.strokeStyle = "#c9c9d8";
+    ctx.strokeStyle = this.theme.laneLine;
     ctx.lineWidth = 2;
     ctx.setLineDash([16, 16]);
     ctx.lineDashOffset = -(this.roadOffset % 32);
@@ -296,7 +327,7 @@ export class Game {
     const ctx = this.ctx;
     const w = this.ballPixelSize * BALL_COLS;
     const h = this.ballPixelSize * BALL_ROWS;
-    drawSprite(ctx, FOOTBALL_SPRITE, FOOTBALL_COLORS, cx - w / 2, cy - h / 2, this.ballPixelSize);
+    drawSprite(ctx, FOOTBALL_SPRITE, this.theme.ballColors, cx - w / 2, cy - h / 2, this.ballPixelSize);
   }
 
   drawCarShadow(cx, top) {
@@ -310,7 +341,7 @@ export class Game {
   drawCar(cx, top) {
     const ctx = this.ctx;
     const w = this.carWidth;
-    drawSprite(ctx, CAR_SPRITE, CAR_COLORS, cx - w / 2, top, this.carPixelSize);
+    drawSprite(ctx, CAR_SPRITE, this.theme.carColors, cx - w / 2, top, this.carPixelSize);
   }
 
   drawParticles() {
