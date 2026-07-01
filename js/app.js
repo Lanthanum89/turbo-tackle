@@ -80,8 +80,9 @@ bindPress(restartBtn, showStartScreen);
 
 document.addEventListener("keydown", (e) => {
   if (!game) return;
-  if (e.key === "ArrowLeft" || e.key === "a") game.moveLeft();
-  if (e.key === "ArrowRight" || e.key === "d") game.moveRight();
+  const key = e.key.toLowerCase();
+  if (key === "arrowleft" || key === "a") game.moveLeft();
+  if (key === "arrowright" || key === "d") game.moveRight();
 });
 
 bindPress(document.getElementById("btn-left"), () => game && game.moveLeft());
