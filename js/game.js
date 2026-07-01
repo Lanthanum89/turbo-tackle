@@ -50,8 +50,16 @@ export class Game {
 
   resize() {
     const dpr = window.devicePixelRatio || 1;
-    const availableWidth = window.innerWidth;
-    const availableHeight = window.innerHeight;
+    const container = this.canvas.parentElement;
+    const containerStyle = getComputedStyle(container);
+    const availableWidth =
+      container.clientWidth -
+      parseFloat(containerStyle.paddingLeft) -
+      parseFloat(containerStyle.paddingRight);
+    const availableHeight =
+      container.clientHeight -
+      parseFloat(containerStyle.paddingTop) -
+      parseFloat(containerStyle.paddingBottom);
 
     let width;
     let height;
@@ -147,7 +155,6 @@ export class Game {
     const carTop = this.displayHeight - this.carHeight - 20;
     for (const ball of this.balls) {
       ball.y += this.ballSpeed * dt;
-      ball.spin += dt * 6;
     }
 
     if (this.invulnerableTimer <= 0) {
@@ -184,7 +191,6 @@ export class Game {
       lane,
       y: -this.ballPixelSize * BALL_ROWS,
       radius: this.laneWidth * 0.18,
-      spin: 0,
       hit: false,
     });
   }
@@ -249,10 +255,10 @@ export class Game {
     for (const [left, right] of stripes) {
       for (let y = -blockSize * 2; y < this.displayHeight + blockSize * 2; y += blockSize) {
         for (let x = left; x < right; x += blockSize) {
-          const row = Math.round((y + offset) / blockSize);
-          const col = Math.round(x / blockSize);
+          const row = Math.floor((y + offset) / blockSize);
+          const col = Math.floor(x / blockSize);
           ctx.fillStyle = (row + col) % 2 === 0 ? "#1f7a3d" : "#256b34";
-          ctx.fillRect(x, y + offset, blockSize, blockSize);
+          ctx.fillRect(x, Math.floor(y + offset), blockSize, blockSize);
         }
       }
     }

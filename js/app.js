@@ -32,6 +32,11 @@ function renderLives(count) {
 }
 
 function showStartScreen() {
+  if (game) {
+    game.stop();
+    game.destroy();
+    game = null;
+  }
   startScreen.classList.remove("hidden");
   gameOverScreen.classList.add("hidden");
   hud.classList.add("hidden");
