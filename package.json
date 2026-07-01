@@ -1,0 +1,9 @@
+{
+  "name": "turbo-tackle",
+  "version": "0.1.0",
+  "description": "Retro 8-bit racer for kids, dodge footballs, built as a PWA",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "license": "MIT"
+}

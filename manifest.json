@@ -1,0 +1,19 @@
+{
+  "name": "Turbo Tackle",
+  "short_name": "Turbo Tackle",
+  "description": "Retro 8-bit racer for kids - dodge the footballs!",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0f23",
+  "theme_color": "#0f0f23",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

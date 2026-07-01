@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Turbo Tackle</title>
+<meta name="theme-color" content="#0f0f23" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="game-container">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="start-screen" class="overlay">
+    <h1>🏎️ TURBO TACKLE</h1>
+    <p class="subtitle">Dodge the footballs!</p>
+    <div class="difficulty-select">
+      <button class="diff-btn" data-difficulty="easy">Easy</button>
+      <button class="diff-btn" data-difficulty="normal">Normal</button>
+      <button class="diff-btn" data-difficulty="hard">Hard</button>
+    </div>
+    <p id="high-score-display" class="high-score"></p>
+  </div>
+
+  <div id="game-over-screen" class="overlay hidden">
+    <h1>GAME OVER</h1>
+    <p id="final-score" class="score-line"></p>
+    <p id="high-score-line" class="score-line"></p>
+    <button id="restart-btn" class="diff-btn">Play Again</button>
+  </div>
+
+  <div id="hud" class="hidden">
+    <span id="score-hud">0</span>
+    <span id="lives-hud"></span>
+  </div>
+
+  <div id="touch-controls" class="hidden">
+    <button id="btn-left" aria-label="Move left">◀</button>
+    <button id="btn-right" aria-label="Move right">▶</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
