@@ -17,19 +17,34 @@ export const CAR_SPRITE = [
   "..DDDDDDDD..",
 ];
 
-export const FOOTBALL_SPRITE = [
-  "...oWWWWo...",
-  ".oWWWWWWWWo.",
-  ".oWWWWWWWWo.",
-  "oWWWWWWWWWWo",
-  "oWWWBBBBWWWo",
-  "oWWBBBBBBWWo",
-  "oWWBBBBBBWWo",
-  "oWWWBBBBWWWo",
-  "oWWWWWWWWWWo",
-  ".oWWWWWWWWo.",
-  ".oWWWWWWWWo.",
-  "...oWWWWo...",
+export const STAR_SPRITE = [
+  ".....SS.....",
+  "....SSSS....",
+  ".....SS.....",
+  ".....SS.....",
+  "..SSSSssss..",
+  "SSSSSSssssss",
+  "SSSSSSssssss",
+  "..SSSSssss..",
+  ".....SS.....",
+  ".....SS.....",
+  "....SSSS....",
+  ".....SS.....",
+];
+
+export const ROCK_SPRITE = [
+  "...rRRRRr...",
+  ".rRRRRRRRRr.",
+  ".rRRRRRRRRr.",
+  "rRRRRRRRRRRr",
+  "rRRRrrrrRRRr",
+  "rRRrrrrrrRRr",
+  "rRRrrrrrrRRr",
+  "rRRRrrrrRRRr",
+  "rRRRRRRRRRRr",
+  ".rRRRRRRRRr.",
+  ".rRRRRRRRRr.",
+  "...rRRRRr...",
 ];
 
 export function drawSprite(ctx, rows, colors, x, y, pixelSize) {

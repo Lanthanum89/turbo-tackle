@@ -1,19 +1,21 @@
-import { CAR_SPRITE, FOOTBALL_SPRITE, drawSprite } from "./sprites.js";
+import { CAR_SPRITE, STAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
 
 const LANE_COUNT = 3;
 const TRACK_MARGIN_RATIO = 0.1;
 const CAR_COLS = CAR_SPRITE[0].length;
 const CAR_ROWS = CAR_SPRITE.length;
-const BALL_COLS = FOOTBALL_SPRITE[0].length;
-const BALL_ROWS = FOOTBALL_SPRITE.length;
+const ENTITY_COLS = STAR_SPRITE[0].length;
+const ENTITY_ROWS = STAR_SPRITE.length;
 const TARGET_ASPECT = 9 / 16;
 const MAX_WIDTH = 520;
 const INVULNERABLE_SECONDS = 1.1;
+const STAR_POINTS = 25;
+const PASSIVE_SCORE_PER_SEC = 2;
 
 export const DIFFICULTY_SETTINGS = {
-  easy: { lives: 5, spawnIntervalMs: 1400, ballSpeed: 130, speedRampPerSec: 2.5 },
-  normal: { lives: 4, spawnIntervalMs: 1000, ballSpeed: 175, speedRampPerSec: 5 },
-  hard: { lives: 3, spawnIntervalMs: 720, ballSpeed: 225, speedRampPerSec: 9 },
+  easy: { lives: 5, spawnIntervalMs: 1400, fallSpeed: 130, speedRampPerSec: 2.5, starChance: 0.55 },
+  normal: { lives: 4, spawnIntervalMs: 1000, fallSpeed: 175, speedRampPerSec: 5, starChance: 0.45 },
+  hard: { lives: 3, spawnIntervalMs: 720, fallSpeed: 225, speedRampPerSec: 9, starChance: 0.35 },
 };
 
 export class Game {
@@ -26,7 +28,7 @@ export class Game {
     this.callbacks = callbacks || {};
 
     this.carLane = 1;
-    this.balls = [];
+    this.entities = [];
     this.particles = [];
     this.resize();
     this.onResize = () => this.resize();
@@ -36,8 +38,9 @@ export class Game {
     this.lives = this.settings.lives;
     this.score = 0;
     this.dodged = 0;
+    this.starsCollected = 0;
     this.elapsed = 0;
-    this.ballSpeed = this.settings.ballSpeed;
+    this.fallSpeed = this.settings.fallSpeed;
     this.timeSinceSpawn = 0;
     this.roadOffset = 0;
     this.invulnerableTimer = 0;
@@ -91,10 +94,10 @@ export class Game {
     this.carWidth = this.carPixelSize * CAR_COLS;
     this.carHeight = this.carPixelSize * CAR_ROWS;
 
-    this.ballPixelSize = (this.laneWidth * 0.4) / BALL_COLS;
+    this.entityPixelSize = (this.laneWidth * 0.4) / ENTITY_COLS;
     this.carBottomMargin = Math.max(48, this.displayHeight * 0.09);
-    for (const ball of this.balls) {
-      ball.radius = this.laneWidth * 0.18;
+    for (const entity of this.entities) {
+      entity.radius = this.laneWidth * 0.18;
     }
   }
 
@@ -159,10 +162,10 @@ export class Game {
   }
 
   update(dt) {
-    this.score += dt * 10;
+    this.score += dt * PASSIVE_SCORE_PER_SEC;
     this.elapsed += dt;
-    this.ballSpeed += this.settings.speedRampPerSec * dt;
-    this.roadOffset += this.ballSpeed * dt;
+    this.fallSpeed += this.settings.speedRampPerSec * dt;
+    this.roadOffset += this.fallSpeed * dt;
 
     if (this.invulnerableTimer > 0) {
       this.invulnerableTimer = Math.max(0, this.invulnerableTimer - dt);
@@ -171,44 +174,54 @@ export class Game {
     this.timeSinceSpawn += dt * 1000;
     if (this.timeSinceSpawn >= this.settings.spawnIntervalMs) {
       this.timeSinceSpawn = 0;
-      this.spawnBall();
+      this.spawnEntity();
     }
 
     const carTop = this.carTopY();
-    for (const ball of this.balls) {
-      ball.y += this.ballSpeed * dt;
+    for (const entity of this.entities) {
+      entity.y += this.fallSpeed * dt;
     }
 
-    if (this.invulnerableTimer <= 0) {
-      for (const ball of this.balls) {
-        if (ball.hit) continue;
-        const ballBottom = ball.y + ball.radius;
-        const ballTop = ball.y - ball.radius;
-        const inCarLane = ball.lane === this.carLane;
-        if (inCarLane && ballBottom >= carTop && ballTop <= carTop + this.carHeight) {
-          ball.hit = true;
-          this.lives -= 1;
-          this.invulnerableTimer = INVULNERABLE_SECONDS;
-          this.spawnHitParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
-          this.callbacks.onHit && this.callbacks.onHit(this.lives);
-          if (this.lives <= 0) {
-            this.stop();
-            this.callbacks.onGameOver &&
-              this.callbacks.onGameOver(Math.floor(this.score), {
-                dodged: this.dodged,
-                elapsed: this.elapsed,
-              });
-            return;
-          }
-          break;
-        }
+    for (const entity of this.entities) {
+      if (entity.hit) continue;
+      const bottom = entity.y + entity.radius;
+      const top = entity.y - entity.radius;
+      if (entity.lane !== this.carLane || bottom < carTop || top > carTop + this.carHeight) {
+        continue;
       }
+
+      if (entity.type === "star") {
+        entity.hit = true;
+        this.score += STAR_POINTS;
+        this.starsCollected += 1;
+        this.spawnPickupParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
+        this.callbacks.onPickup && this.callbacks.onPickup(this.starsCollected);
+        continue;
+      }
+
+      if (this.invulnerableTimer > 0) continue;
+      entity.hit = true;
+      this.lives -= 1;
+      this.invulnerableTimer = INVULNERABLE_SECONDS;
+      this.spawnHitParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
+      this.callbacks.onHit && this.callbacks.onHit(this.lives);
+      if (this.lives <= 0) {
+        this.stop();
+        this.callbacks.onGameOver &&
+          this.callbacks.onGameOver(Math.floor(this.score), {
+            starsCollected: this.starsCollected,
+            dodged: this.dodged,
+            elapsed: this.elapsed,
+          });
+        return;
+      }
+      break;
     }
 
-    this.balls = this.balls.filter((b) => {
-      if (b.hit) return false;
-      const onScreen = b.y - b.radius < this.displayHeight;
-      if (!onScreen) this.dodged += 1;
+    this.entities = this.entities.filter((e) => {
+      if (e.hit) return false;
+      const onScreen = e.y - e.radius < this.displayHeight;
+      if (!onScreen && e.type === "rock") this.dodged += 1;
       return onScreen;
     });
     this.updateParticles(dt);
@@ -216,11 +229,13 @@ export class Game {
     this.callbacks.onScoreUpdate && this.callbacks.onScoreUpdate(Math.floor(this.score));
   }
 
-  spawnBall() {
+  spawnEntity() {
     const lane = Math.floor(Math.random() * LANE_COUNT);
-    this.balls.push({
+    const type = Math.random() < this.settings.starChance ? "star" : "rock";
+    this.entities.push({
       lane,
-      y: -this.ballPixelSize * BALL_ROWS,
+      type,
+      y: -this.entityPixelSize * ENTITY_ROWS,
       radius: this.laneWidth * 0.18,
       hit: false,
     });
@@ -242,6 +257,22 @@ export class Game {
     }
   }
 
+  spawnPickupParticles(cx, cy) {
+    for (let i = 0; i < 10; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 40 + Math.random() * 90;
+      this.particles.push({
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 70,
+        life: 0.4,
+        maxLife: 0.4,
+        color: this.theme.sparkColor,
+      });
+    }
+  }
+
   updateParticles(dt) {
     for (const p of this.particles) {
       p.x += p.vx * dt;
@@ -258,9 +289,10 @@ export class Game {
     this.drawGrass();
     this.drawTrack();
 
-    for (const ball of this.balls) {
-      const cx = this.laneCenterX(ball.lane);
-      this.drawFootball(cx, ball.y);
+    for (const entity of this.entities) {
+      const cx = this.laneCenterX(entity.lane);
+      if (entity.type === "star") this.drawStar(cx, entity.y);
+      else this.drawRock(cx, entity.y);
     }
 
     const carX = this.laneCenterX(this.carLane);
@@ -323,11 +355,18 @@ export class Game {
     ctx.setLineDash([]);
   }
 
-  drawFootball(cx, cy) {
+  drawStar(cx, cy) {
     const ctx = this.ctx;
-    const w = this.ballPixelSize * BALL_COLS;
-    const h = this.ballPixelSize * BALL_ROWS;
-    drawSprite(ctx, FOOTBALL_SPRITE, this.theme.ballColors, cx - w / 2, cy - h / 2, this.ballPixelSize);
+    const w = this.entityPixelSize * ENTITY_COLS;
+    const h = this.entityPixelSize * ENTITY_ROWS;
+    drawSprite(ctx, STAR_SPRITE, this.theme.starColors, cx - w / 2, cy - h / 2, this.entityPixelSize);
+  }
+
+  drawRock(cx, cy) {
+    const ctx = this.ctx;
+    const w = this.entityPixelSize * ENTITY_COLS;
+    const h = this.entityPixelSize * ENTITY_ROWS;
+    drawSprite(ctx, ROCK_SPRITE, this.theme.rockColors, cx - w / 2, cy - h / 2, this.entityPixelSize);
   }
 
   drawCarShadow(cx, top) {

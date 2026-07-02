@@ -18,9 +18,9 @@
 
   <div id="start-screen" class="overlay">
     <button id="mute-btn" class="icon-btn corner-btn" aria-label="Toggle sound">🔊</button>
-    <div class="title-emoji">🏎️</div>
+    <img src="icons/icon.svg" class="title-badge" alt="Turbo Tackle" />
     <h1>TURBO<br />TACKLE</h1>
-    <p class="subtitle">Dodge the footballs!</p>
+    <p class="subtitle">Dodge the rocks, grab the stars!</p>
 
     <div class="difficulty-select">
       <button class="diff-card diff-easy" data-difficulty="easy">
@@ -33,7 +33,7 @@
       </button>
       <button class="diff-card diff-hard" data-difficulty="hard">
         <span class="diff-card-row"><span class="diff-name">HARD</span><span class="diff-hearts">❤❤❤</span></span>
-        <span class="diff-desc">Fast, less warning before balls arrive</span>
+        <span class="diff-desc">Fast, less warning before rocks arrive</span>
       </button>
     </div>
 
@@ -48,6 +48,7 @@
     <div class="stats-row">
       <span id="stat-best">Best: 0</span>
       <span id="stat-time">Time: 0.0s</span>
+      <span id="stat-stars">Stars: 0</span>
       <span id="stat-dodged">Dodged: 0</span>
     </div>
     <button id="restart-btn" class="primary-btn">Play Again</button>

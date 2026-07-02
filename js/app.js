@@ -17,6 +17,7 @@ const finalScoreEl = document.getElementById("final-score");
 const statBest = document.getElementById("stat-best");
 const statTime = document.getElementById("stat-time");
 const statDodged = document.getElementById("stat-dodged");
+const statStars = document.getElementById("stat-stars");
 const highScoreDisplay = document.getElementById("high-score-display");
 const restartBtn = document.getElementById("restart-btn");
 const changeDifficultyBtn = document.getElementById("change-difficulty-btn");
@@ -139,6 +140,9 @@ async function startGame(difficulty) {
       renderLives(livesLeft);
       playTone(140, 0.18, "sawtooth");
     },
+    onPickup: () => {
+      playTone(880, 0.12, "sine");
+    },
     onGameOver: (finalScore, stats) => {
       const prevBest = getHighScore();
       const best = setHighScoreIfBetter(finalScore);
@@ -148,6 +152,7 @@ async function startGame(difficulty) {
       statBest.textContent = `Best: ${best}`;
       statTime.textContent = `Time: ${formatTime(stats.elapsed)}`;
       statDodged.textContent = `Dodged: ${stats.dodged}`;
+      statStars.textContent = `Stars: ${stats.starsCollected}`;
       gameOverScreen.classList.remove("hidden");
       hud.classList.add("hidden");
       touchControls.classList.add("hidden");
