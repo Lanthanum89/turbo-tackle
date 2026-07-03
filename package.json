@@ -1,7 +1,7 @@
 {
-  "name": "turbo-tackle",
+  "name": "turbo-dash",
   "version": "0.1.0",
-  "description": "Retro 8-bit racer for kids, dodge rocks, built as a PWA",
+  "description": "Retro 8-bit racer for kids with three modes: dodge, collect & avoid, and rainbow rocket, built as a PWA",
   "scripts": {
     "start": "npx serve ."
   },

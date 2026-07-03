@@ -1,6 +1,8 @@
-# Turbo Tackle
+# Turbo Dash
 
-A pixel-art racer for young kids: dodge the rocks, don't lose all your lives. Built as an installable PWA, no build step required.
+*(Formerly "Turbo Tackle" — renamed once the game grew beyond a single dodge mechanic. Still hosted at the `/turbo-tackle/` URL below for continuity.)*
+
+A pixel-art racer for young kids with three selectable modes: **Dodge** (just avoid the rocks), **Collect & Avoid** (grab stars, dodge rocks), and **Rainbow Rocket** (follow a rainbow lane that drifts between lanes, no fail state). Built as an installable PWA, no build step required.
 
 **Play it:** https://lanthanum89.github.io/turbo-tackle/
 
@@ -36,4 +38,4 @@ Then open the printed local URL in a browser.
 
 ## Status
 
-Live and playable, with difficulty select (easy/normal/hard), pixel-art car and rock sprites, and a mobile/tablet-aware layout. Still open: tuned difficulty pacing for younger kids and a decision on endless-dodge vs. discrete levels.
+Live and playable, with three modes (Dodge, Collect & Avoid, Rainbow Rocket), each with its own difficulty select (easy/normal/hard) and independent high score, pixel-art car/star/rock sprites, and a mobile/tablet-aware layout.

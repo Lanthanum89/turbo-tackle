@@ -23,4 +23,16 @@ export const THEME = {
     r: "#3d4048",
     h: "#9a9fac",
   },
+  starColors: {
+    S: "#ffe135",
+    s: "#c9a300",
+  },
+  rainbowBands: [
+    "#ff2d2d",
+    "#ff9d2d",
+    "#ffe135",
+    "#39ff6a",
+    "#3d8bff",
+    "#8b3dff",
+  ],
 };

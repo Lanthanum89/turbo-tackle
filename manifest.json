@@ -1,7 +1,7 @@
 {
-  "name": "Turbo Tackle",
-  "short_name": "Turbo Tackle",
-  "description": "Retro 8-bit racer for kids — dodge the rocks!",
+  "name": "Turbo Dash",
+  "short_name": "Turbo Dash",
+  "description": "Retro 8-bit racer for kids — dodge, collect, or follow the rainbow across three modes!",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
