@@ -17,21 +17,6 @@ export const CAR_SPRITE = [
   "..DDDDDDDD..",
 ];
 
-export const STAR_SPRITE = [
-  ".....SS.....",
-  "....SSSS....",
-  ".....SS.....",
-  ".....SS.....",
-  "..SSSSssss..",
-  "SSSSSSssssss",
-  "SSSSSSssssss",
-  "..SSSSssss..",
-  ".....SS.....",
-  ".....SS.....",
-  "....SSSS....",
-  ".....SS.....",
-];
-
 export const ROCK_SPRITE = [
   "...rRRRRr...",
   ".rRRRRRRRRr.",
