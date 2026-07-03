@@ -6,8 +6,9 @@ const CAR_COLS = CAR_SPRITE[0].length;
 const CAR_ROWS = CAR_SPRITE.length;
 const ENTITY_COLS = ROCK_SPRITE[0].length;
 const ENTITY_ROWS = ROCK_SPRITE.length;
-const TARGET_ASPECT = 9 / 16;
-const MAX_WIDTH = 520;
+const PORTRAIT_ASPECT = 9 / 16;
+const LANDSCAPE_ASPECT = 0.8;
+const MAX_WIDTH = 720;
 const INVULNERABLE_SECONDS = 1.1;
 const STAR_POINTS = 25;
 
@@ -99,24 +100,27 @@ export class Game {
       parseFloat(containerStyle.paddingTop) -
       parseFloat(containerStyle.paddingBottom);
 
+    const targetAspect = availableWidth > availableHeight ? LANDSCAPE_ASPECT : PORTRAIT_ASPECT;
+
     let width;
     let height;
-    if (availableWidth / availableHeight > TARGET_ASPECT) {
+    if (availableWidth / availableHeight > targetAspect) {
       height = availableHeight;
-      width = height * TARGET_ASPECT;
+      width = height * targetAspect;
     } else {
       width = availableWidth;
-      height = width / TARGET_ASPECT;
+      height = width / targetAspect;
     }
     if (width > MAX_WIDTH) {
       width = MAX_WIDTH;
-      height = width / TARGET_ASPECT;
+      height = width / targetAspect;
     }
 
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
+    container.style.setProperty("--game-width", `${width}px`);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
 
