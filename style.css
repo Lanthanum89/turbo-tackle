@@ -43,9 +43,42 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 14px;
-  background: rgba(5, 3, 10, 0.92);
+  background:
+    radial-gradient(ellipse 60% 45% at 18% 12%, rgba(61, 139, 255, 0.22), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 88% 82%, rgba(255, 45, 45, 0.16), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 105%, rgba(139, 61, 255, 0.14), transparent 65%),
+    rgba(5, 3, 10, 0.96);
   text-align: center;
   padding: 20px;
+  overflow: hidden;
+}
+
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 18%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 27% 62%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 52% 10%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 68% 42%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 84% 76%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 92% 28%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 8% 82%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 40% 88%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 76% 6%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 20% 40%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 60% 68%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 96% 55%, #fff, transparent);
+  animation: star-twinkle 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes star-twinkle {
+  from { opacity: 0.35; }
+  to { opacity: 0.85; }
 }
 
 .overlay.hidden {
