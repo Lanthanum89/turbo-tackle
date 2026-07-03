@@ -343,6 +343,8 @@ html, body {
   top: 12px;
   left: 0;
   right: 0;
+  max-width: var(--game-width, 720px);
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -383,6 +385,8 @@ html, body {
   bottom: calc(20px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
+  max-width: var(--game-width, 720px);
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   padding: 0 clamp(16px, 6vw, 48px);
