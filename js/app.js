@@ -26,6 +26,8 @@ const changeDifficultyBtn = document.getElementById("change-difficulty-btn");
 const backToModesBtn = document.getElementById("back-to-modes-btn");
 const difficultyModeTitle = document.getElementById("difficulty-mode-title");
 const difficultyModeDesc = document.getElementById("difficulty-mode-desc");
+const controlHint = document.getElementById("control-hint");
+const gameOverTitle = document.getElementById("game-over-title");
 const difficultySelect = document.getElementById("difficulty-select");
 const pauseBtn = document.getElementById("pause-btn");
 const resumeBtn = document.getElementById("resume-btn");
@@ -37,6 +39,18 @@ const DIFFICULTY_DESCRIPTIONS = {
   easy: "Slow & steady — great for first runs",
   normal: "Picks up speed as you go",
   hard: "Fast, less warning before things arrive",
+};
+
+const CONTROL_HINTS = {
+  dodge: "← → or swipe to dodge",
+  collect: "← → or swipe to collect",
+  rainbow: "← → or swipe to steer",
+};
+
+const GAME_OVER_TITLES = {
+  dodge: "GAME OVER",
+  collect: "GAME OVER",
+  rainbow: "TIME'S UP",
 };
 
 let game = null;
@@ -224,6 +238,7 @@ function showDifficultyScreen(mode) {
   const modeConfig = MODES[mode];
   difficultyModeTitle.textContent = modeConfig.label.toUpperCase();
   difficultyModeDesc.textContent = modeConfig.description;
+  controlHint.textContent = CONTROL_HINTS[mode];
   renderDifficultyCards(mode);
   highScoreDisplay.textContent = `High Score: ${getHighScore(mode)}`;
   modeScreen.classList.add("hidden");
@@ -268,6 +283,7 @@ async function startGame(mode, difficulty) {
     onGameOver: (finalScore, stats) => {
       const prevBest = getHighScore(mode);
       const best = setHighScoreIfBetter(finalScore, mode);
+      gameOverTitle.textContent = GAME_OVER_TITLES[mode];
       gameOverMessage.textContent =
         finalScore > prevBest && finalScore > 0 ? "New high score!" : "Nice run — go again?";
       finalScoreEl.textContent = String(finalScore);
