@@ -30,6 +30,11 @@ export const THEME = {
     O: "#7a5a00",
     W: "#fff6d6",
   },
+  treeColors: {
+    F: "#1e5c33",
+    f: "#164a28",
+    B: "#5a3d24",
+  },
   rainbowBands: [
     "#ff2d2d",
     "#ff9d2d",

@@ -77,6 +77,21 @@ export const ROCK_SPRITE = [
   "......................",
 ]; // 22 rows x 22 cols
 
+export const TREE_SPRITE = [
+  "...FFf...",
+  "...FFf...",
+  "..FFFff..",
+  "..FFFff..",
+  "..FFFff..",
+  "FFFFFffff",
+  "FFFFFffff",
+  "FFFFFffff",
+  "FFFFFffff",
+  "....B....",
+  "....B....",
+  "....B....",
+]; // 12 rows x 9 cols
+
 export function drawSprite(ctx, rows, colors, x, y, pixelSize) {
   for (let r = 0; r < rows.length; r++) {
     const row = rows[r];
