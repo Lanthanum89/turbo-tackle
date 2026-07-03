@@ -25,7 +25,7 @@ export const CAR_SPRITE = [
   "......DCCCcCCD......",
   "......DTCCcCTD......",
   "........DDDD........",
-]; // 28 rows x 22 cols
+]; // 26 rows x 20 cols
 
 export const STAR_SPRITE = [
   "......................",
