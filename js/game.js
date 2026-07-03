@@ -280,7 +280,7 @@ export class Game {
 
     this.timeSinceSwitch += dt * 1000;
     if (this.timeSinceSwitch >= this.settings.switchIntervalMs) {
-      this.timeSinceSwitch = 0;
+      this.timeSinceSwitch %= this.settings.switchIntervalMs;
       let newLane;
       do {
         newLane = Math.floor(Math.random() * LANE_COUNT);
