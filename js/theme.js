@@ -21,5 +21,6 @@ export const THEME = {
   rockColors: {
     R: "#6b6f7a",
     r: "#3d4048",
+    h: "#9a9fac",
   },
 };

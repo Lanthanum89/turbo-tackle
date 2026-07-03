@@ -75,6 +75,39 @@ function playTone(freq, dur, type) {
   } catch (e) {}
 }
 
+const MELODY = [
+  523.25, 659.25, 783.99, 659.25, 523.25, 659.25, 783.99, 1046.5,
+  880.0, 783.99, 659.25, 783.99, 523.25, 587.33, 659.25, 783.99,
+];
+const MELODY_STEP_MS = 220;
+let melodyIndex = 0;
+let musicInterval = null;
+
+function playMelodyNote(freq) {
+  if (muted) return;
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.045, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.18);
+  } catch (e) {}
+}
+
+function startMusic() {
+  if (musicInterval) return;
+  musicInterval = setInterval(() => {
+    playMelodyNote(MELODY[melodyIndex % MELODY.length]);
+    melodyIndex += 1;
+  }, MELODY_STEP_MS);
+}
+
 function updateMuteIcons() {
   const icon = muted ? "🔇" : "🔊";
   muteBtn.textContent = icon;
@@ -87,7 +120,14 @@ function toggleMute() {
 }
 
 function renderLives(count) {
-  livesHud.textContent = "❤".repeat(Math.max(count, 0));
+  livesHud.innerHTML = "";
+  for (let i = 0; i < Math.max(count, 0); i++) {
+    const heart = document.createElement("img");
+    heart.src = "icons/heart.svg";
+    heart.className = "life-icon";
+    heart.alt = "life";
+    livesHud.appendChild(heart);
+  }
 }
 
 function formatTime(sec) {
@@ -123,6 +163,7 @@ async function runCountdown() {
 async function startGame(difficulty) {
   lastDifficulty = difficulty;
   ensureAudio();
+  startMusic();
   if (game) {
     game.destroy();
     game = null;

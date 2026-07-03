@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "turbo-tackle-";
-const CACHE_NAME = `${CACHE_PREFIX}v5`;
+const CACHE_NAME = `${CACHE_PREFIX}v6`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,6 +14,8 @@ const ASSETS = [
   "./icons/icon-180.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/heart.svg",
+  "./icons/pause-icon.svg",
 ];
 
 self.addEventListener("install", (event) => {
