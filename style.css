@@ -241,10 +241,11 @@ html, body {
   border-color: rgba(255, 255, 255, 0.35);
 }
 .mode-rainbow .mode-name {
+  color: #ffe135;
   background: linear-gradient(90deg, #ff2d2d, #ff9d2d, #ffe135, #39ff6a, #3d8bff, #8b3dff);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .control-hint {
