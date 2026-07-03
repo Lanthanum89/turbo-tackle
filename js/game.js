@@ -1,21 +1,20 @@
-import { CAR_SPRITE, STAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
+import { CAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
 
 const LANE_COUNT = 3;
 const TRACK_MARGIN_RATIO = 0.1;
 const CAR_COLS = CAR_SPRITE[0].length;
 const CAR_ROWS = CAR_SPRITE.length;
-const ENTITY_COLS = STAR_SPRITE[0].length;
-const ENTITY_ROWS = STAR_SPRITE.length;
+const ENTITY_COLS = ROCK_SPRITE[0].length;
+const ENTITY_ROWS = ROCK_SPRITE.length;
 const TARGET_ASPECT = 9 / 16;
 const MAX_WIDTH = 520;
 const INVULNERABLE_SECONDS = 1.1;
-const STAR_POINTS = 25;
-const PASSIVE_SCORE_PER_SEC = 2;
+const PASSIVE_SCORE_PER_SEC = 10;
 
 export const DIFFICULTY_SETTINGS = {
-  easy: { lives: 5, spawnIntervalMs: 1400, fallSpeed: 130, speedRampPerSec: 2.5, starChance: 0.55 },
-  normal: { lives: 4, spawnIntervalMs: 1000, fallSpeed: 175, speedRampPerSec: 5, starChance: 0.45 },
-  hard: { lives: 3, spawnIntervalMs: 720, fallSpeed: 225, speedRampPerSec: 9, starChance: 0.35 },
+  easy: { lives: 5, spawnIntervalMs: 1400, fallSpeed: 130, speedRampPerSec: 2.5 },
+  normal: { lives: 4, spawnIntervalMs: 1000, fallSpeed: 175, speedRampPerSec: 5 },
+  hard: { lives: 3, spawnIntervalMs: 720, fallSpeed: 225, speedRampPerSec: 9 },
 };
 
 export class Game {
@@ -38,7 +37,6 @@ export class Game {
     this.lives = this.settings.lives;
     this.score = 0;
     this.dodged = 0;
-    this.starsCollected = 0;
     this.elapsed = 0;
     this.fallSpeed = this.settings.fallSpeed;
     this.timeSinceSpawn = 0;
@@ -182,46 +180,36 @@ export class Game {
       entity.y += this.fallSpeed * dt;
     }
 
-    for (const entity of this.entities) {
-      if (entity.hit) continue;
-      const bottom = entity.y + entity.radius;
-      const top = entity.y - entity.radius;
-      if (entity.lane !== this.carLane || bottom < carTop || top > carTop + this.carHeight) {
-        continue;
+    if (this.invulnerableTimer <= 0) {
+      for (const entity of this.entities) {
+        if (entity.hit) continue;
+        const bottom = entity.y + entity.radius;
+        const top = entity.y - entity.radius;
+        const inCarLane = entity.lane === this.carLane;
+        if (inCarLane && bottom >= carTop && top <= carTop + this.carHeight) {
+          entity.hit = true;
+          this.lives -= 1;
+          this.invulnerableTimer = INVULNERABLE_SECONDS;
+          this.spawnHitParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
+          this.callbacks.onHit && this.callbacks.onHit(this.lives);
+          if (this.lives <= 0) {
+            this.stop();
+            this.callbacks.onGameOver &&
+              this.callbacks.onGameOver(Math.floor(this.score), {
+                dodged: this.dodged,
+                elapsed: this.elapsed,
+              });
+            return;
+          }
+          break;
+        }
       }
-
-      if (entity.type === "star") {
-        entity.hit = true;
-        this.score += STAR_POINTS;
-        this.starsCollected += 1;
-        this.spawnPickupParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
-        this.callbacks.onPickup && this.callbacks.onPickup(this.starsCollected);
-        continue;
-      }
-
-      if (this.invulnerableTimer > 0) continue;
-      entity.hit = true;
-      this.lives -= 1;
-      this.invulnerableTimer = INVULNERABLE_SECONDS;
-      this.spawnHitParticles(this.laneCenterX(this.carLane), carTop + this.carHeight * 0.5);
-      this.callbacks.onHit && this.callbacks.onHit(this.lives);
-      if (this.lives <= 0) {
-        this.stop();
-        this.callbacks.onGameOver &&
-          this.callbacks.onGameOver(Math.floor(this.score), {
-            starsCollected: this.starsCollected,
-            dodged: this.dodged,
-            elapsed: this.elapsed,
-          });
-        return;
-      }
-      break;
     }
 
     this.entities = this.entities.filter((e) => {
       if (e.hit) return false;
       const onScreen = e.y - e.radius < this.displayHeight;
-      if (!onScreen && e.type === "rock") this.dodged += 1;
+      if (!onScreen) this.dodged += 1;
       return onScreen;
     });
     this.updateParticles(dt);
@@ -231,10 +219,8 @@ export class Game {
 
   spawnEntity() {
     const lane = Math.floor(Math.random() * LANE_COUNT);
-    const type = Math.random() < this.settings.starChance ? "star" : "rock";
     this.entities.push({
       lane,
-      type,
       y: -this.entityPixelSize * ENTITY_ROWS,
       radius: this.laneWidth * 0.18,
       hit: false,
@@ -257,22 +243,6 @@ export class Game {
     }
   }
 
-  spawnPickupParticles(cx, cy) {
-    for (let i = 0; i < 10; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 40 + Math.random() * 90;
-      this.particles.push({
-        x: cx,
-        y: cy,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 70,
-        life: 0.4,
-        maxLife: 0.4,
-        color: this.theme.sparkColor,
-      });
-    }
-  }
-
   updateParticles(dt) {
     for (const p of this.particles) {
       p.x += p.vx * dt;
@@ -291,8 +261,7 @@ export class Game {
 
     for (const entity of this.entities) {
       const cx = this.laneCenterX(entity.lane);
-      if (entity.type === "star") this.drawStar(cx, entity.y);
-      else this.drawRock(cx, entity.y);
+      this.drawRock(cx, entity.y);
     }
 
     const carX = this.laneCenterX(this.carLane);
@@ -353,13 +322,6 @@ export class Game {
       ctx.stroke();
     }
     ctx.setLineDash([]);
-  }
-
-  drawStar(cx, cy) {
-    const ctx = this.ctx;
-    const w = this.entityPixelSize * ENTITY_COLS;
-    const h = this.entityPixelSize * ENTITY_ROWS;
-    drawSprite(ctx, STAR_SPRITE, this.theme.starColors, cx - w / 2, cy - h / 2, this.entityPixelSize);
   }
 
   drawRock(cx, cy) {

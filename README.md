@@ -1,6 +1,6 @@
 # Turbo Tackle
 
-A pixel-art racer for young kids: dodge the rocks, grab the stars, don't lose all your lives. Built as an installable PWA, no build step required.
+A pixel-art racer for young kids: dodge the rocks, don't lose all your lives. Built as an installable PWA, no build step required.
 
 **Play it:** https://lanthanum89.github.io/turbo-tackle/
 
@@ -36,4 +36,4 @@ Then open the printed local URL in a browser.
 
 ## Status
 
-Live and playable, with difficulty select (easy/normal/hard), pixel-art car, star, and rock sprites, and a mobile/tablet-aware layout. Still open: tuned difficulty pacing for younger kids and a decision on endless-dodge vs. discrete levels.
+Live and playable, with difficulty select (easy/normal/hard), pixel-art car and rock sprites, and a mobile/tablet-aware layout. Still open: tuned difficulty pacing for younger kids and a decision on endless-dodge vs. discrete levels.

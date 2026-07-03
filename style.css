@@ -90,6 +90,25 @@ html, body {
   cursor: pointer;
 }
 
+.pixel-btn {
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pixel-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+.pixel-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
 .difficulty-select {
   display: flex;
   flex-direction: column;
@@ -270,10 +289,16 @@ html, body {
 }
 
 #lives-hud {
-  color: #ff2d2d;
-  letter-spacing: 3px;
-  font-size: 17px;
-  text-shadow: 0 0 6px rgba(255, 45, 45, 0.6);
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  filter: drop-shadow(0 0 4px rgba(255, 45, 45, 0.6));
+}
+
+.life-icon {
+  width: 15px;
+  height: 15px;
+  image-rendering: pixelated;
 }
 
 #touch-controls {

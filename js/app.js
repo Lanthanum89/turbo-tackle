@@ -17,7 +17,6 @@ const finalScoreEl = document.getElementById("final-score");
 const statBest = document.getElementById("stat-best");
 const statTime = document.getElementById("stat-time");
 const statDodged = document.getElementById("stat-dodged");
-const statStars = document.getElementById("stat-stars");
 const highScoreDisplay = document.getElementById("high-score-display");
 const restartBtn = document.getElementById("restart-btn");
 const changeDifficultyBtn = document.getElementById("change-difficulty-btn");
@@ -76,6 +75,46 @@ function playTone(freq, dur, type) {
   } catch (e) {}
 }
 
+const MELODY = [
+  523.25, 659.25, 783.99, 659.25, 523.25, 659.25, 783.99, 1046.5,
+  880.0, 783.99, 659.25, 783.99, 523.25, 587.33, 659.25, 783.99,
+];
+const MELODY_STEP_MS = 220;
+let melodyIndex = 0;
+let musicInterval = null;
+
+function playMelodyNote(freq) {
+  if (muted) return;
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.045, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.18);
+  } catch (e) {}
+}
+
+function startMusic() {
+  if (muted || musicInterval) return;
+  musicInterval = setInterval(() => {
+    playMelodyNote(MELODY[melodyIndex % MELODY.length]);
+    melodyIndex += 1;
+  }, MELODY_STEP_MS);
+}
+
+function stopMusic() {
+  if (musicInterval) {
+    clearInterval(musicInterval);
+    musicInterval = null;
+  }
+}
+
 function updateMuteIcons() {
   const icon = muted ? "🔇" : "🔊";
   muteBtn.textContent = icon;
@@ -85,10 +124,25 @@ function updateMuteIcons() {
 function toggleMute() {
   muted = !muted;
   updateMuteIcons();
+  if (muted) {
+    stopMusic();
+  } else {
+    startMusic();
+  }
 }
 
 function renderLives(count) {
-  livesHud.textContent = "❤".repeat(Math.max(count, 0));
+  const lives = Math.max(count, 0);
+  livesHud.innerHTML = "";
+  livesHud.setAttribute("aria-label", `${lives} ${lives === 1 ? "life" : "lives"} remaining`);
+  for (let i = 0; i < lives; i++) {
+    const heart = document.createElement("img");
+    heart.src = "icons/heart.svg";
+    heart.className = "life-icon";
+    heart.alt = "";
+    heart.setAttribute("aria-hidden", "true");
+    livesHud.appendChild(heart);
+  }
 }
 
 function formatTime(sec) {
@@ -124,6 +178,7 @@ async function runCountdown() {
 async function startGame(difficulty) {
   lastDifficulty = difficulty;
   ensureAudio();
+  startMusic();
   if (game) {
     game.destroy();
     game = null;
@@ -140,9 +195,6 @@ async function startGame(difficulty) {
       renderLives(livesLeft);
       playTone(140, 0.18, "sawtooth");
     },
-    onPickup: () => {
-      playTone(880, 0.12, "sine");
-    },
     onGameOver: (finalScore, stats) => {
       const prevBest = getHighScore();
       const best = setHighScoreIfBetter(finalScore);
@@ -152,7 +204,6 @@ async function startGame(difficulty) {
       statBest.textContent = `Best: ${best}`;
       statTime.textContent = `Time: ${formatTime(stats.elapsed)}`;
       statDodged.textContent = `Dodged: ${stats.dodged}`;
-      statStars.textContent = `Stars: ${stats.starsCollected}`;
       gameOverScreen.classList.remove("hidden");
       hud.classList.add("hidden");
       touchControls.classList.add("hidden");

@@ -18,12 +18,9 @@ export const THEME = {
     G: "#141018",
     T: "#39ff6a",
   },
-  starColors: {
-    S: "#ffe135",
-    s: "#c9a300",
-  },
   rockColors: {
     R: "#6b6f7a",
     r: "#3d4048",
+    h: "#9a9fac",
   },
 };
