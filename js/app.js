@@ -1,8 +1,9 @@
-import { Game } from "./game.js";
+import { Game, MODES } from "./game.js";
 import { THEME } from "./theme.js";
 import { getHighScore, setHighScoreIfBetter } from "./storage.js";
 
 const canvas = document.getElementById("game-canvas");
+const modeScreen = document.getElementById("mode-screen");
 const startScreen = document.getElementById("start-screen");
 const gameOverScreen = document.getElementById("game-over-screen");
 const pauseOverlay = document.getElementById("pause-overlay");
@@ -16,17 +17,44 @@ const gameOverMessage = document.getElementById("game-over-message");
 const finalScoreEl = document.getElementById("final-score");
 const statBest = document.getElementById("stat-best");
 const statTime = document.getElementById("stat-time");
+const statStars = document.getElementById("stat-stars");
 const statDodged = document.getElementById("stat-dodged");
+const statAccuracy = document.getElementById("stat-accuracy");
 const highScoreDisplay = document.getElementById("high-score-display");
 const restartBtn = document.getElementById("restart-btn");
 const changeDifficultyBtn = document.getElementById("change-difficulty-btn");
+const backToModesBtn = document.getElementById("back-to-modes-btn");
+const difficultyModeTitle = document.getElementById("difficulty-mode-title");
+const difficultyModeDesc = document.getElementById("difficulty-mode-desc");
+const controlHint = document.getElementById("control-hint");
+const gameOverTitle = document.getElementById("game-over-title");
+const difficultySelect = document.getElementById("difficulty-select");
 const pauseBtn = document.getElementById("pause-btn");
 const resumeBtn = document.getElementById("resume-btn");
 const quitBtn = document.getElementById("quit-btn");
 const muteBtn = document.getElementById("mute-btn");
 const pauseMuteBtn = document.getElementById("pause-mute-btn");
 
+const DIFFICULTY_DESCRIPTIONS = {
+  easy: "Slow & steady — great for first runs",
+  normal: "Picks up speed as you go",
+  hard: "Fast, less warning before things arrive",
+};
+
+const CONTROL_HINTS = {
+  dodge: "← → or swipe to dodge",
+  collect: "← → or swipe to collect",
+  rainbow: "← → or swipe to steer",
+};
+
+const GAME_OVER_TITLES = {
+  dodge: "GAME OVER",
+  collect: "GAME OVER",
+  rainbow: "TIME'S UP",
+};
+
 let game = null;
+let lastMode = "dodge";
 let lastDifficulty = "normal";
 let muted = false;
 let audioCtx = null;
@@ -153,17 +181,68 @@ function formatTime(sec) {
   return `${m}m ${r}s`;
 }
 
-function showStartScreen() {
+function renderDifficultyCards(mode) {
+  const modeConfig = MODES[mode];
+  difficultySelect.innerHTML = "";
+  for (const tier of ["easy", "normal", "hard"]) {
+    const settings = modeConfig.difficulties[tier];
+    const btn = document.createElement("button");
+    btn.className = `diff-card diff-${tier}`;
+    btn.dataset.difficulty = tier;
+
+    const row = document.createElement("span");
+    row.className = "diff-card-row";
+
+    const name = document.createElement("span");
+    name.className = "diff-name";
+    name.textContent = tier.toUpperCase();
+    row.appendChild(name);
+
+    if (modeConfig.hasLives) {
+      const hearts = document.createElement("span");
+      hearts.className = "diff-hearts";
+      hearts.textContent = "❤".repeat(settings.lives);
+      row.appendChild(hearts);
+    } else {
+      const time = document.createElement("span");
+      time.className = "diff-time";
+      time.textContent = `${settings.timeLimitSec}s`;
+      row.appendChild(time);
+    }
+    btn.appendChild(row);
+
+    const desc = document.createElement("span");
+    desc.className = "diff-desc";
+    desc.textContent = DIFFICULTY_DESCRIPTIONS[tier];
+    btn.appendChild(desc);
+
+    bindPress(btn, () => startGame(mode, tier));
+    difficultySelect.appendChild(btn);
+  }
+}
+
+function showModeScreen() {
   if (game) {
     game.destroy();
     game = null;
   }
-  startScreen.classList.remove("hidden");
+  modeScreen.classList.remove("hidden");
+  startScreen.classList.add("hidden");
   gameOverScreen.classList.add("hidden");
   pauseOverlay.classList.add("hidden");
   hud.classList.add("hidden");
   touchControls.classList.add("hidden");
-  highScoreDisplay.textContent = `High Score: ${getHighScore()}`;
+}
+
+function showDifficultyScreen(mode) {
+  const modeConfig = MODES[mode];
+  difficultyModeTitle.textContent = modeConfig.label.toUpperCase();
+  difficultyModeDesc.textContent = modeConfig.description;
+  controlHint.textContent = CONTROL_HINTS[mode];
+  renderDifficultyCards(mode);
+  highScoreDisplay.textContent = `High Score: ${getHighScore(mode)}`;
+  modeScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
 }
 
 async function runCountdown() {
@@ -175,7 +254,8 @@ async function runCountdown() {
   countdownOverlay.classList.add("hidden");
 }
 
-async function startGame(difficulty) {
+async function startGame(mode, difficulty) {
+  lastMode = mode;
   lastDifficulty = difficulty;
   ensureAudio();
   startMusic();
@@ -187,7 +267,9 @@ async function startGame(difficulty) {
   gameOverScreen.classList.add("hidden");
   pauseOverlay.classList.add("hidden");
 
-  game = new Game(canvas, difficulty, THEME, {
+  const modeConfig = MODES[mode];
+
+  game = new Game(canvas, mode, difficulty, THEME, {
     onScoreUpdate: (score) => {
       scoreHud.textContent = String(score);
     },
@@ -195,15 +277,36 @@ async function startGame(difficulty) {
       renderLives(livesLeft);
       playTone(140, 0.18, "sawtooth");
     },
+    onPickup: () => {
+      playTone(880, 0.12, "sine");
+    },
     onGameOver: (finalScore, stats) => {
-      const prevBest = getHighScore();
-      const best = setHighScoreIfBetter(finalScore);
+      const prevBest = getHighScore(mode);
+      const best = setHighScoreIfBetter(finalScore, mode);
+      gameOverTitle.textContent = GAME_OVER_TITLES[mode];
       gameOverMessage.textContent =
         finalScore > prevBest && finalScore > 0 ? "New high score!" : "Nice run — go again?";
       finalScoreEl.textContent = String(finalScore);
       statBest.textContent = `Best: ${best}`;
       statTime.textContent = `Time: ${formatTime(stats.elapsed)}`;
-      statDodged.textContent = `Dodged: ${stats.dodged}`;
+
+      statStars.classList.add("hidden");
+      statDodged.classList.add("hidden");
+      statAccuracy.classList.add("hidden");
+      if (mode === "collect") {
+        statStars.textContent = `Stars: ${stats.starsCollected}`;
+        statStars.classList.remove("hidden");
+        statDodged.textContent = `Dodged: ${stats.dodged}`;
+        statDodged.classList.remove("hidden");
+      } else if (mode === "dodge") {
+        statDodged.textContent = `Dodged: ${stats.dodged}`;
+        statDodged.classList.remove("hidden");
+      } else if (mode === "rainbow") {
+        const pct = stats.elapsed > 0 ? Math.round((stats.matchedTime / stats.elapsed) * 100) : 0;
+        statAccuracy.textContent = `On Target: ${pct}%`;
+        statAccuracy.classList.remove("hidden");
+      }
+
       gameOverScreen.classList.remove("hidden");
       hud.classList.add("hidden");
       touchControls.classList.add("hidden");
@@ -215,7 +318,13 @@ async function startGame(difficulty) {
     },
   });
 
-  renderLives(game.lives);
+  if (modeConfig.hasLives) {
+    livesHud.style.display = "";
+    renderLives(game.lives);
+  } else {
+    livesHud.style.display = "none";
+    livesHud.innerHTML = "";
+  }
   scoreHud.textContent = "0";
   game.draw();
 
@@ -237,13 +346,14 @@ function setPaused(paused) {
   }
 }
 
-document.querySelectorAll(".diff-card[data-difficulty]").forEach((btn) => {
-  bindPress(btn, () => startGame(btn.dataset.difficulty));
+document.querySelectorAll(".mode-card[data-mode]").forEach((btn) => {
+  bindPress(btn, () => showDifficultyScreen(btn.dataset.mode));
 });
 
-bindPress(restartBtn, () => startGame(lastDifficulty));
-bindPress(changeDifficultyBtn, showStartScreen);
-bindPress(quitBtn, showStartScreen);
+bindPress(backToModesBtn, showModeScreen);
+bindPress(restartBtn, () => startGame(lastMode, lastDifficulty));
+bindPress(changeDifficultyBtn, showModeScreen);
+bindPress(quitBtn, showModeScreen);
 bindPress(pauseBtn, () => setPaused(true));
 bindPress(resumeBtn, () => setPaused(false));
 bindPress(muteBtn, toggleMute);
@@ -299,4 +409,4 @@ if ("serviceWorker" in navigator) {
 }
 
 updateMuteIcons();
-showStartScreen();
+showModeScreen();

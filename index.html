@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>Turbo Tackle</title>
+<title>Turbo Dash</title>
 <meta name="theme-color" content="#050813" />
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
@@ -16,39 +16,49 @@
 <div id="game-container">
   <canvas id="game-canvas"></canvas>
 
-  <div id="start-screen" class="overlay">
+  <div id="mode-screen" class="overlay">
     <button id="mute-btn" class="icon-btn corner-btn" aria-label="Toggle sound">🔊</button>
-    <img src="icons/icon.svg" class="title-badge" alt="Turbo Tackle" />
-    <h1>TURBO<br />TACKLE</h1>
-    <p class="subtitle">Dodge the rocks!</p>
+    <img src="icons/icon.svg" class="title-badge" alt="Turbo Dash" />
+    <h1>TURBO<br />DASH</h1>
+    <p class="subtitle">Pick a mode!</p>
 
-    <div class="difficulty-select">
-      <button class="diff-card diff-easy" data-difficulty="easy">
-        <span class="diff-card-row"><span class="diff-name">EASY</span><span class="diff-hearts">❤❤❤❤❤</span></span>
-        <span class="diff-desc">Slow &amp; steady — great for first runs</span>
+    <div class="mode-select">
+      <button class="mode-card mode-dodge" data-mode="dodge">
+        <span class="mode-name">DODGE</span>
+        <span class="mode-desc">Just avoid the rocks</span>
       </button>
-      <button class="diff-card diff-normal" data-difficulty="normal">
-        <span class="diff-card-row"><span class="diff-name">NORMAL</span><span class="diff-hearts">❤❤❤❤</span></span>
-        <span class="diff-desc">Picks up speed as you go</span>
+      <button class="mode-card mode-collect" data-mode="collect">
+        <span class="mode-name">COLLECT &amp; AVOID</span>
+        <span class="mode-desc">Grab stars, dodge rocks</span>
       </button>
-      <button class="diff-card diff-hard" data-difficulty="hard">
-        <span class="diff-card-row"><span class="diff-name">HARD</span><span class="diff-hearts">❤❤❤</span></span>
-        <span class="diff-desc">Fast, less warning before rocks arrive</span>
+      <button class="mode-card mode-rainbow" data-mode="rainbow">
+        <span class="mode-name">RAINBOW ROCKET</span>
+        <span class="mode-desc">Follow the rainbow lane</span>
       </button>
     </div>
+  </div>
+
+  <div id="start-screen" class="overlay hidden">
+    <button id="back-to-modes-btn" class="icon-btn back-btn" aria-label="Back to modes">←</button>
+    <h1 id="difficulty-mode-title">DODGE</h1>
+    <p class="subtitle" id="difficulty-mode-desc">Just avoid the rocks</p>
+
+    <div id="difficulty-select" class="difficulty-select"></div>
 
     <p id="high-score-display" class="high-score"></p>
-    <p class="control-hint">← → or swipe to dodge</p>
+    <p id="control-hint" class="control-hint">← → or swipe to dodge</p>
   </div>
 
   <div id="game-over-screen" class="overlay hidden">
-    <h1 class="game-over-title">GAME OVER</h1>
+    <h1 id="game-over-title" class="game-over-title">GAME OVER</h1>
     <p id="game-over-message" class="message-line"></p>
     <p id="final-score" class="final-score"></p>
     <div class="stats-row">
       <span id="stat-best">Best: 0</span>
       <span id="stat-time">Time: 0.0s</span>
-      <span id="stat-dodged">Dodged: 0</span>
+      <span id="stat-stars" class="hidden">Stars: 0</span>
+      <span id="stat-dodged" class="hidden">Dodged: 0</span>
+      <span id="stat-accuracy" class="hidden">On Target: 0%</span>
     </div>
     <button id="restart-btn" class="primary-btn">Play Again</button>
     <button id="change-difficulty-btn" class="outline-btn">Main Menu</button>

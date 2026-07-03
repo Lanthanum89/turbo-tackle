@@ -52,6 +52,10 @@ html, body {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
 .overlay h1 {
   font-family: "Press Start 2P", monospace;
   font-size: clamp(20px, 6vw, 28px);
@@ -77,6 +81,13 @@ html, body {
   position: absolute;
   top: 14px;
   right: 14px;
+}
+
+.back-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 18px;
 }
 
 .icon-btn {
@@ -169,6 +180,72 @@ html, body {
   font-size: 11px;
   color: #a9a9c4;
   margin-top: 2px;
+}
+
+.diff-time {
+  color: #ffe135;
+  font-weight: 700;
+}
+
+.mode-select {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.mode-card {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+
+.mode-card:active {
+  transform: translateY(2px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mode-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.mode-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.mode-desc {
+  font-size: 11px;
+  color: #a9a9c4;
+}
+
+.mode-dodge { border-color: rgba(61, 139, 255, 0.35); }
+.mode-dodge .mode-name { color: #3d8bff; }
+
+.mode-collect { border-color: rgba(255, 225, 53, 0.4); }
+.mode-collect .mode-name { color: #ffe135; }
+
+.mode-rainbow {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.mode-rainbow .mode-name {
+  color: #ffe135;
+  background: linear-gradient(90deg, #ff2d2d, #ff9d2d, #ffe135, #39ff6a, #3d8bff, #8b3dff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .control-hint {
