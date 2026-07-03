@@ -101,11 +101,18 @@ function playMelodyNote(freq) {
 }
 
 function startMusic() {
-  if (musicInterval) return;
+  if (muted || musicInterval) return;
   musicInterval = setInterval(() => {
     playMelodyNote(MELODY[melodyIndex % MELODY.length]);
     melodyIndex += 1;
   }, MELODY_STEP_MS);
+}
+
+function stopMusic() {
+  if (musicInterval) {
+    clearInterval(musicInterval);
+    musicInterval = null;
+  }
 }
 
 function updateMuteIcons() {
@@ -117,15 +124,23 @@ function updateMuteIcons() {
 function toggleMute() {
   muted = !muted;
   updateMuteIcons();
+  if (muted) {
+    stopMusic();
+  } else {
+    startMusic();
+  }
 }
 
 function renderLives(count) {
+  const lives = Math.max(count, 0);
   livesHud.innerHTML = "";
-  for (let i = 0; i < Math.max(count, 0); i++) {
+  livesHud.setAttribute("aria-label", `${lives} ${lives === 1 ? "life" : "lives"} remaining`);
+  for (let i = 0; i < lives; i++) {
     const heart = document.createElement("img");
     heart.src = "icons/heart.svg";
     heart.className = "life-icon";
-    heart.alt = "life";
+    heart.alt = "";
+    heart.setAttribute("aria-hidden", "true");
     livesHud.appendChild(heart);
   }
 }
