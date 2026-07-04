@@ -38,4 +38,4 @@ Then open the printed local URL in a browser.
 
 ## Status
 
-Live and playable, with three modes (Dodge, Collect & Avoid, Rainbow Rocket), each with its own difficulty select (easy/normal/hard) and independent high score, pixel-art car/star/rock sprites, and a mobile/tablet-aware layout.
+Live and playable, with three modes (Dodge, Collect & Avoid, Rainbow Rocket), each with its own difficulty select (easy/normal/hard) and independent high score, pixel-art rocket/star/rock sprites, and a mobile/tablet-aware layout.

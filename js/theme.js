@@ -5,17 +5,13 @@ export const THEME = {
   edge: "#ff2d2d",
   laneLine: "#3d8bff",
   sparkColor: "#ffe135",
-  carColors: {
-    C: "#243a7a",
+  shipColors: {
+    C: "#3d8bff",
     c: "#ff2d2d",
-    D: "#0a1230",
-    W: "#5aa4ff",
-    w: "#1a4fa0",
     H: "#ffe135",
     K: "#0a0a12",
-    k: "#4a5170",
-    M: "#181420",
-    G: "#141018",
+    W: "#cdeeff",
+    w: "#1a4fa0",
     T: "#39ff6a",
   },
   rockColors: {

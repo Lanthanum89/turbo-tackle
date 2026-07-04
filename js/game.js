@@ -1,9 +1,9 @@
-import { CAR_SPRITE, STAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
+import { ROCKET_SPRITE, STAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
 
 const LANE_COUNT = 3;
 const TRACK_MARGIN_RATIO = 0.1;
-const CAR_COLS = CAR_SPRITE[0].length;
-const CAR_ROWS = CAR_SPRITE.length;
+const CAR_COLS = ROCKET_SPRITE[0].length;
+const CAR_ROWS = ROCKET_SPRITE.length;
 const ENTITY_COLS = ROCK_SPRITE[0].length;
 const ENTITY_ROWS = ROCK_SPRITE.length;
 const PORTRAIT_ASPECT = 9 / 16;
@@ -500,7 +500,7 @@ export class Game {
   drawCar(cx, top) {
     const ctx = this.ctx;
     const w = this.carWidth;
-    drawSprite(ctx, CAR_SPRITE, this.theme.carColors, cx - w / 2, top, this.carPixelSize);
+    drawSprite(ctx, ROCKET_SPRITE, this.theme.shipColors, cx - w / 2, top, this.carPixelSize);
   }
 
   drawParticles() {
