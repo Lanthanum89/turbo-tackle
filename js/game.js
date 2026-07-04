@@ -14,6 +14,11 @@ const MAX_WIDTH = 720;
 const INVULNERABLE_SECONDS = 1.1;
 const STAR_POINTS = 25;
 
+function seededRandom(seed) {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 export const MODES = {
   dodge: {
     label: "Dodge",
@@ -141,6 +146,32 @@ export class Game {
     for (const entity of this.entities) {
       entity.radius = this.laneWidth * 0.18;
     }
+
+    this.treePixelSize = (this.trackMargin * 0.5) / TREE_COLS;
+    this.treeWidth = this.treePixelSize * TREE_COLS;
+    this.treeHeight = this.treePixelSize * TREE_ROWS;
+    this.treeCycles = [this.buildTreeCycle(1.3), this.buildTreeCycle(7.9)];
+  }
+
+  buildTreeCycle(seed) {
+    const treeHeight = this.treeHeight;
+    const count = 6;
+    const jitterAmplitude = this.trackMargin * 0.18;
+    const trees = [];
+    let cursor = 0;
+    for (let i = 0; i < count; i++) {
+      const gapRand = seededRandom(seed + i * 3.11);
+      cursor += treeHeight * (2.4 + gapRand * 2.8);
+      const jitterRand = seededRandom(seed + i * 3.11 + 1.9);
+      const scaleRand = seededRandom(seed + i * 3.11 + 2.7);
+      trees.push({
+        y: cursor,
+        xJitter: (jitterRand - 0.5) * 2 * jitterAmplitude,
+        scale: 0.78 + scaleRand * 0.4,
+      });
+    }
+    cursor += treeHeight * 2.4;
+    return { trees, length: cursor };
   }
 
   carTopY() {
@@ -433,20 +464,26 @@ export class Game {
 
   drawTrees() {
     const ctx = this.ctx;
-    const pixelSize = (this.trackMargin * 0.5) / TREE_COLS;
-    const treeWidth = pixelSize * TREE_COLS;
-    const treeHeight = pixelSize * TREE_ROWS;
-    const spacing = treeHeight * 3.2;
-
-    const lanes = [
-      { x: this.trackMargin * 0.5 - treeWidth / 2, phase: 0 },
-      { x: this.displayWidth - this.trackMargin * 0.5 - treeWidth / 2, phase: spacing / 2 },
+    const baseX = [
+      this.trackMargin * 0.5 - this.treeWidth / 2,
+      this.displayWidth - this.trackMargin * 0.5 - this.treeWidth / 2,
     ];
 
-    for (const { x, phase } of lanes) {
-      const offset = (this.roadOffset + phase) % spacing;
-      for (let y = -spacing; y < this.displayHeight + spacing; y += spacing) {
-        drawSprite(ctx, TREE_SPRITE, this.theme.treeColors, x, y + offset - treeHeight, pixelSize);
+    for (let lane = 0; lane < 2; lane++) {
+      const cycle = this.treeCycles[lane];
+      const offset = this.roadOffset % cycle.length;
+      const reps = Math.ceil(this.displayHeight / cycle.length) + 2;
+      for (let k = -1; k <= reps; k++) {
+        const cycleBase = k * cycle.length - offset;
+        for (const tree of cycle.trees) {
+          const y = cycleBase + tree.y;
+          if (y < -this.treeHeight * 2 || y > this.displayHeight + this.treeHeight * 2) continue;
+          const pixelSize = this.treePixelSize * tree.scale;
+          const w = pixelSize * TREE_COLS;
+          const h = pixelSize * TREE_ROWS;
+          const x = baseX[lane] + tree.xJitter - (w - this.treeWidth) / 2;
+          drawSprite(ctx, TREE_SPRITE, this.theme.treeColors, x, y - h, pixelSize);
+        }
       }
     }
   }
