@@ -287,6 +287,32 @@ html, body {
   margin: 0;
 }
 
+.menu-footer {
+  position: absolute;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+}
+
+.pixel-heart {
+  width: 10px;
+  height: 10px;
+  image-rendering: pixelated;
+}
+
+@media (max-height: 440px) {
+  .menu-footer {
+    display: none;
+  }
+}
+
 .high-score, .message-line {
   color: #ffe135;
   font-size: 13px;

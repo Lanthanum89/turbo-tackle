@@ -12,8 +12,8 @@ export const THEME = {
     W: "#5aa4ff",
     w: "#1a4fa0",
     H: "#ffe135",
-    K: "#0a0a12",
-    k: "#4a5170",
+    K: "#2e2b33",
+    k: "#9a9fac",
     M: "#181420",
     G: "#141018",
     T: "#39ff6a",
@@ -29,6 +29,11 @@ export const THEME = {
     s: "#c9a300",
     O: "#7a5a00",
     W: "#fff6d6",
+  },
+  treeColors: {
+    F: "#1e5c33",
+    f: "#164a28",
+    B: "#5a3d24",
   },
   rainbowBands: [
     "#ff2d2d",

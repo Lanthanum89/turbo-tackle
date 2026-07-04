@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "turbo-tackle-";
-const CACHE_NAME = `${CACHE_PREFIX}v9`;
+const CACHE_NAME = `${CACHE_PREFIX}v11`;
 const ASSETS = [
   "./",
   "./index.html",

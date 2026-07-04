@@ -1,4 +1,4 @@
-import { CAR_SPRITE, STAR_SPRITE, ROCK_SPRITE, drawSprite } from "./sprites.js";
+import { CAR_SPRITE, STAR_SPRITE, ROCK_SPRITE, TREE_SPRITE, drawSprite } from "./sprites.js";
 
 const LANE_COUNT = 3;
 const TRACK_MARGIN_RATIO = 0.1;
@@ -6,6 +6,8 @@ const CAR_COLS = CAR_SPRITE[0].length;
 const CAR_ROWS = CAR_SPRITE.length;
 const ENTITY_COLS = ROCK_SPRITE[0].length;
 const ENTITY_ROWS = ROCK_SPRITE.length;
+const TREE_COLS = TREE_SPRITE[0].length;
+const TREE_ROWS = TREE_SPRITE.length;
 const PORTRAIT_ASPECT = 9 / 16;
 const LANDSCAPE_ASPECT = 0.8;
 const MAX_WIDTH = 720;
@@ -379,6 +381,7 @@ export class Game {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
     this.drawGrass();
+    this.drawTrees();
     this.drawTrack();
 
     if (this.mode === "rainbow") {
@@ -424,6 +427,26 @@ export class Game {
           ctx.fillStyle = (row + col) % 2 === 0 ? this.theme.grassA : this.theme.grassB;
           ctx.fillRect(x, Math.floor(y + offset), blockSize, blockSize);
         }
+      }
+    }
+  }
+
+  drawTrees() {
+    const ctx = this.ctx;
+    const pixelSize = (this.trackMargin * 0.5) / TREE_COLS;
+    const treeWidth = pixelSize * TREE_COLS;
+    const treeHeight = pixelSize * TREE_ROWS;
+    const spacing = treeHeight * 3.2;
+
+    const lanes = [
+      { x: this.trackMargin * 0.5 - treeWidth / 2, phase: 0 },
+      { x: this.displayWidth - this.trackMargin * 0.5 - treeWidth / 2, phase: spacing / 2 },
+    ];
+
+    for (const { x, phase } of lanes) {
+      const offset = (this.roadOffset + phase) % spacing;
+      for (let y = -spacing; y < this.displayHeight + spacing; y += spacing) {
+        drawSprite(ctx, TREE_SPRITE, this.theme.treeColors, x, y + offset - treeHeight, pixelSize);
       }
     }
   }
